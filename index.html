@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primitive City Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        .game-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .main-panel {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .resources-panel {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .panel-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4fc3f7;
+            text-shadow: 0 0 5px rgba(79, 195, 247, 0.5);
+        }
+        
+        .tent-container {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .tent {
+            width: 200px;
+            height: 200px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="20,80 50,20 80,80" fill="%238B4513"/><rect x="30" y="80" width="40" height="10" fill="%235D4037"/></svg>') no-repeat center;
+            background-size: contain;
+            cursor: pointer;
+            transition: transform 0.1s;
+            margin: 0 auto;
+        }
+        
+        .tent:active {
+            transform: scale(0.95);
+        }
+        
+        .people-counter {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .resource-item {
+            background: rgba(30, 30, 50, 0.8);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .resource-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .resource-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #4fc3f7;
+        }
+        
+        .resource-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .research-panel {
+            margin-top: 30px;
+        }
+        
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .research-item {
+            background: rgba(40, 40, 60, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .research-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: rgba(50, 50, 80, 0.9);
+        }
+        
+        .research-item.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .research-item.locked:hover {
+            transform: none;
+            box-shadow: none;
+            background: rgba(40, 40, 60, 0.8);
+        }
+        
+        .research-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #ffd700;
+        }
+        
+        .research-cost {
+            font-size: 0.9rem;
+            color: #ff9800;
+        }
+        
+        .research-desc {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            color: #90a4ae;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #4caf50;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            transform: translateX(200%);
+            transition: transform 0.3s;
+            z-index: 100;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #90a4ae;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .resource-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Primitive City Builder</h1>
+            <p>Click the tent to create people. Assign them to research to unlock new resources!</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="main-panel">
+                <h2 class="panel-title">Your Settlement</h2>
+                <div class="tent-container">
+                    <div class="tent" id="tent"></div>
+                    <div class="people-counter">People: <span id="people-count">0</span></div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-people">0</div>
+                        <div class="stat-label">Total People</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="active-research">0</div>
+                        <div class="stat-label">Active Research</div>
+                    </div>
+                </div>
+                
+                <div class="research-panel">
+                    <h2 class="panel-title">Research</h2>
+                    <div class="research-grid" id="research-grid">
+                        <!-- Research items will be added here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resources-panel">
+                <h2 class="panel-title">Resources</h2>
+                <div class="resource-grid" id="resource-grid">
+                    <!-- Resource items will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">Research completed!</div>
+    
+    <script>
+        // Game state
+        const gameState = {
+            people: 0,
+            totalPeople: 0,
+            resources: {
+                food: 0,
+                wood: 0,
+                stone: 0,
+                mineral: 0
+            },
+            research: {
+                basicTools: { 
+                    name: "Basic Tools", 
+                    cost: 5, 
+                    progress: 0, 
+                    completed: false,
+                    description: "Create simple stone tools to gather resources more efficiently"
+                },
+                agriculture: { 
+                    name: "Agriculture", 
+                    cost: 10, 
+                    progress: 0, 
+                    completed: false,
+                    description: "Develop farming techniques to produce food"
+                },
+                mining: { 
+                    name: "Mining", 
+                    cost: 15, 
+                    progress: 0, 
+                    completed: false,
+                    description: "Extract minerals from the earth"
+                },
+                advancedTools: { 
+                    name: "Advanced Tools", 
+                    cost: 25, 
+                    progress: 0, 
+                    completed: false,
+                    description: "Craft better tools for faster resource gathering"
+                }
+            },
+            activeResearch: []
+        };
+        
+        // DOM Elements
+        const tentElement = document.getElementById('tent');
+        const peopleCountElement = document.getElementById('people-count');
+        const totalPeopleElement = document.getElementById('total-people');
+        const activeResearchElement = document.getElementById('active-research');
+        const resourceGridElement = document.getElementById('resource-grid');
+        const researchGridElement = document.getElementById('research-grid');
+        const notificationElement = document.getElementById('notification');
+        
+        // Initialize the game
+        function initGame() {
+            renderResources();
+            renderResearch();
+            updateStats();
+            
+            // Tent click handler
+            tentElement.addEventListener('click', () => {
+                gameState.people++;
+                gameState.totalPeople++;
+                updateStats();
+                showNotification('+1 Person created!');
+            });
+            
+            // Game loop
+            setInterval(gameLoop, 1000);
+        }
+        
+        // Game loop - handles automatic resource generation
+        function gameLoop() {
+            // Process active research
+            for (let i = gameState.activeResearch.length - 1; i >= 0; i--) {
+                const researchId = gameState.activeResearch[i];
+                const research = gameState.research[researchId];
+                
+                // Add progress (1 person per second contributes to research)
+                research.progress += 1;
+                
+                // Check if research is complete
+                if (research.progress >= research.cost) {
+                    research.completed = true;
+                    gameState.activeResearch.splice(i, 1);
+                    showNotification(`${research.name} completed!`);
+                    renderResearch();
+                }
+            }
+            
+            // Generate resources based on completed research
+            if (gameState.research.agriculture.completed) {
+                gameState.resources.food += 0.5;
+            }
+            
+            if (gameState.research.basicTools.completed) {
+                gameState.resources.wood += 0.3;
+                gameState.resources.stone += 0.2;
+            }
+            
+            if (gameState.research.mining.completed) {
+                gameState.resources.mineral += 0.1;
+            }
+            
+            if (gameState.research.advancedTools.completed) {
+                gameState.resources.food += 0.3;
+                gameState.resources.wood += 0.2;
+                gameState.resources.stone += 0.15;
+                gameState.resources.mineral += 0.08;
+            }
+            
+            updateStats();
+        }
+        
+        // Render resources panel
+        function renderResources() {
+            resourceGridElement.innerHTML = '';
+            
+            const resources = [
+                { id: 'food', name: 'Food', icon: '🌾' },
+                { id: 'wood', name: 'Wood', icon: '🪵' },
+                { id: 'stone', name: 'Stone', icon: '🪨' },
+                { id: 'mineral', name: 'Mineral', icon: '⛏️' }
+            ];
+            
+            resources.forEach(resource => {
+                const resourceElement = document.createElement('div');
+                resourceElement.className = 'resource-item';
+                resourceElement.innerHTML = `
+                    <div class="resource-name">${resource.icon} ${resource.name}</div>
+                    <div class="resource-value">${gameState.resources[resource.id].toFixed(1)}</div>
+                `;
+                resourceGridElement.appendChild(resourceElement);
+            });
+        }
+        
+        // Render research panel
+        function renderResearch() {
+            researchGridElement.innerHTML = '';
+            
+            Object.entries(gameState.research).forEach(([id, research]) => {
+                const researchElement = document.createElement('div');
+                researchElement.className = `research-item ${research.completed ? 'completed' : ''} ${gameState.people < research.cost && !research.completed ? 'locked' : ''}`;
+                
+                // Calculate progress percentage
+                const progressPercent = research.completed ? 100 : (research.progress / research.cost) * 100;
+                
+                researchElement.innerHTML = `
+                    <div class="research-title">${research.name}</div>
+                    <div class="research-cost">Cost: ${research.cost} people</div>
+                    <div class="research-desc">${research.description}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                `;
+                
+                // Add click handler if not completed and not locked
+                if (!research.completed && gameState.people >= research.cost) {
+                    researchElement.addEventListener('click', () => {
+                        if (!gameState.activeResearch.includes(id)) {
+                            gameState.activeResearch.push(id);
+                            gameState.people -= research.cost;
+                            updateStats();
+                            renderResearch();
+                            showNotification(`Assigned ${research.cost} people to ${research.name}`);
+                        }
+                    });
+                }
+                
+                researchGridElement.appendChild(researchElement);
+            });
+        }
+        
+        // Update stats display
+        function updateStats() {
+            peopleCountElement.textContent = Math.floor(gameState.people);
+            totalPeopleElement.textContent = gameState.totalPeople;
+            activeResearchElement.textContent = gameState.activeResearch.length;
+            renderResources();
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            notificationElement.textContent = message;
+            notificationElement.classList.add('show');
+            
+            setTimeout(() => {
+                notificationElement.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize the game when the page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
