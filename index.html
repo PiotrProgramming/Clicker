@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Primitive City Builder</title>
     <style>
         * {
@@ -10,203 +10,220 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
         }
         
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            padding: 15px 0;
-            margin-bottom: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-            margin-bottom: 8px;
-            color: #ffd700;
-            letter-spacing: 1px;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            color: #90caf9;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-        
-        .game-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .map-panel {
-            flex: 2;
-            min-width: 500px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b, #0d1b2a);
+            color: #e0e1dd;
             overflow: hidden;
             position: relative;
         }
         
-        .map-container {
-            width: 100%;
-            height: 500px;
-            background: linear-gradient(to bottom, #8fbc8f, #556b2f);
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-        
-        .map-element {
+        /* Frame UI Structure */
+        .game-frame {
             position: absolute;
-            transition: transform 0.2s, opacity 0.3s;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-areas: 
+                "topbar topbar topbar"
+                "map map panel"
+                "map map panel";
+            grid-template-rows: 60px 1fr 1fr;
+            grid-template-columns: 1fr 1fr 320px;
+            gap: 0;
         }
         
-        .map-element:hover {
-            transform: scale(1.1);
+        /* Top Resource Bar */
+        .top-bar {
+            grid-area: topbar;
+            background: rgba(13, 19, 33, 0.9);
+            border-bottom: 2px solid #4361ee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             z-index: 10;
         }
         
-        .resources-panel {
-            flex: 1;
-            min-width: 300px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        .resource-container {
             display: flex;
-            flex-direction: column;
-        }
-        
-        .panel-title {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #4fc3f7;
-            text-shadow: 0 0 5px rgba(79, 195, 247, 0.5);
-            padding-bottom: 10px;
-            border-bottom: 2px solid #37474f;
-        }
-        
-        .tent-container {
-            text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(30, 30, 50, 0.6);
-            border-radius: 12px;
-        }
-        
-        .tent {
-            width: 180px;
-            height: 180px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="20,80 50,20 80,80" fill="%238B4513"/><rect x="30" y="80" width="40" height="10" fill="%235D4037"/></svg>') no-repeat center;
-            background-size: contain;
-            cursor: pointer;
-            transition: transform 0.1s;
-            margin: 0 auto;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-        }
-        
-        .tent:active {
-            transform: scale(0.95);
-        }
-        
-        .people-counter {
-            margin-top: 15px;
-            font-size: 1.3rem;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
-            border-radius: 25px;
-            display: inline-block;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        
-        .resource-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-            flex-grow: 1;
+            gap: 25px;
+            align-items: center;
         }
         
         .resource-item {
-            background: rgba(30, 30, 50, 0.8);
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        
-        .resource-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .resource-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #4fc3f7;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
+            background: rgba(26, 42, 77, 0.7);
+            padding: 8px 16px;
+            border-radius: 30px;
+            min-width: 140px;
+            justify-content: center;
+            border: 1px solid #3a508a;
+        }
+        
+        .resource-icon {
+            font-size: 1.4rem;
         }
         
         .resource-value {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #ffd700;
         }
         
-        .research-panel {
-            margin-top: 25px;
-            flex-shrink: 0;
+        /* Map Area */
+        .map-area {
+            grid-area: map;
+            background: linear-gradient(to bottom, #4f772d, #3a5a2c);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
         }
         
-        .research-grid {
+        .map-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Right Panel */
+        .right-panel {
+            grid-area: panel;
+            background: rgba(13, 19, 33, 0.92);
+            border-left: 2px solid #4361ee;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4361ee #0d1321;
+        }
+        
+        .right-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .right-panel::-webkit-scrollbar-track {
+            background: #0d1321;
+        }
+        
+        .right-panel::-webkit-scrollbar-thumb {
+            background-color: #4361ee;
+            border-radius: 4px;
+        }
+        
+        .panel-section {
+            margin-bottom: 25px;
+        }
+        
+        .panel-title {
+            font-size: 1.4rem;
+            margin-bottom: 18px;
+            color: #4cc9f0;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #3a508a;
+        }
+        
+        /* Tent Creation */
+        .tent-creator {
+            text-align: center;
+            padding: 18px;
+            background: rgba(26, 42, 77, 0.6);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #3a508a;
+        }
+        
+        .tent {
+            width: 160px;
+            height: 160px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="20,80 50,20 80,80" fill="%238B4513"/><rect x="30" y="80" width="40" height="10" fill="%235D4037"/></svg>') no-repeat center;
+            background-size: contain;
+            cursor: pointer;
+            transition: transform 0.15s, filter 0.2s;
+            margin: 0 auto 15px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
+        
+        .tent:hover {
+            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
+        }
+        
+        .tent:active {
+            transform: scale(0.96);
+        }
+        
+        .people-counter {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffd700;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 20px;
+            border-radius: 25px;
+            display: inline-block;
+        }
+        
+        /* Stats */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
             margin-top: 15px;
         }
         
+        .stat-item {
+            background: rgba(26, 42, 77, 0.6);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #3a508a;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #90a4ae;
+        }
+        
+        /* Research */
+        .research-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
         .research-item {
-            background: rgba(40, 40, 60, 0.8);
-            padding: 15px;
+            background: rgba(26, 42, 77, 0.7);
+            padding: 16px;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            border: 1px solid #3a508a;
             position: relative;
-            overflow: hidden;
-            border: 1px solid #37474f;
         }
         
         .research-item:hover:not(.locked) {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            background: rgba(50, 50, 80, 0.9);
-            border-color: #4fc3f7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            border-color: #4cc9f0;
         }
         
         .research-item.locked {
@@ -216,113 +233,63 @@
         }
         
         .research-item.completed {
-            background: rgba(30, 60, 30, 0.8);
+            background: rgba(26, 54, 45, 0.7);
             border-color: #4caf50;
+        }
+        
+        .research-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
         }
         
         .research-title {
             font-weight: bold;
-            margin-bottom: 8px;
+            font-size: 1.2rem;
             color: #ffd700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .research-cost {
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: #ff9800;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         
         .research-desc {
-            font-size: 0.85rem;
-            margin-top: 8px;
-            color: #90a4ae;
+            font-size: 0.9rem;
+            color: #a9d6e5;
             line-height: 1.4;
+            margin-bottom: 10px;
         }
         
         .progress-bar {
             height: 8px;
-            background: #333;
+            background: #1b263b;
             border-radius: 4px;
-            margin-top: 10px;
             overflow: hidden;
+            margin-top: 5px;
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            background: linear-gradient(90deg, #4361ee, #4cc9f0);
             width: 0%;
             transition: width 0.3s;
         }
         
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.85);
-            color: #4caf50;
-            padding: 14px 22px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-            transform: translateX(200%);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-            font-weight: bold;
-            border-left: 4px solid #4caf50;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .stat-item {
-            text-align: center;
-            min-width: 100px;
-        }
-        
-        .stat-value {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #90a4ae;
-        }
-        
-        .map-overlay {
+        /* Map Elements */
+        .map-element {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            color: #e0f7fa;
-            z-index: 5;
+            transition: transform 0.2s, opacity 0.3s;
+            z-index: 2;
         }
         
-        .map-title {
-            font-weight: bold;
-            color: #4fc3f7;
-            margin-bottom: 5px;
+        .map-element:hover {
+            transform: scale(1.15);
+            z-index: 10;
         }
         
-        /* Map element styles */
         .map-tent {
             width: 80px;
             height: 80px;
@@ -331,8 +298,8 @@
         }
         
         .map-people {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="40" r="15" fill="%23FFD700"/><rect x="35" y="55" width="30" height="30" fill="%23FFD700" rx="5"/></svg>') no-repeat center;
             background-size: contain;
         }
@@ -365,62 +332,113 @@
             background-size: contain;
         }
         
-        @media (max-width: 900px) {
-            .game-container {
-                flex-direction: column;
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(13, 19, 33, 0.95);
+            color: #4cc9f0;
+            padding: 14px 22px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(67, 97, 238, 0.5);
+            transform: translateX(200%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            font-weight: bold;
+            border-left: 4px solid #4361ee;
+            max-width: 300px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .game-frame {
+                grid-template-columns: 1fr 1fr 280px;
             }
             
-            .map-container {
-                height: 400px;
+            .resource-item {
+                min-width: 120px;
+                padding: 6px 12px;
             }
             
-            .resource-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .resource-value {
+                font-size: 1.1rem;
             }
         }
         
-        @media (max-width: 600px) {
-            .map-container {
-                height: 300px;
+        @media (max-width: 768px) {
+            .game-frame {
+                grid-template-columns: 1fr 260px;
+                grid-template-areas: 
+                    "topbar topbar"
+                    "map panel"
+                    "map panel";
+            }
+            
+            .resource-container {
+                gap: 15px;
+            }
+            
+            .resource-item {
+                min-width: 100px;
+                padding: 5px 10px;
+            }
+            
+            .resource-value {
+                font-size: 1rem;
             }
             
             .tent {
                 width: 140px;
                 height: 140px;
             }
+        }
+        
+        @media (max-height: 700px) {
+            .top-bar {
+                height: 50px;
+            }
             
-            h1 {
-                font-size: 2rem;
+            .resource-item {
+                padding: 5px 10px;
+                min-width: 110px;
+            }
+            
+            .resource-value {
+                font-size: 1.1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Primitive City Builder</h1>
-            <p class="subtitle">Click the tent to create people. Assign them to research to unlock new buildings and resources on your map!</p>
-        </header>
-        
-        <div class="game-container">
-            <div class="map-panel">
-                <h2 class="panel-title">Settlement Map</h2>
-                <div class="map-container" id="map-container">
-                    <div class="map-overlay">
-                        <div class="map-title">Your Settlement</div>
-                        <div>Expand your civilization by completing research!</div>
-                    </div>
-                    <!-- Map elements will be added here dynamically -->
-                </div>
+    <div class="game-frame">
+        <!-- Top Resource Bar -->
+        <div class="top-bar">
+            <div class="resource-container" id="top-resources">
+                <!-- Resources will be populated here -->
             </div>
-            
-            <div class="resources-panel">
-                <div class="tent-container">
+        </div>
+        
+        <!-- Map Area -->
+        <div class="map-area">
+            <div class="map-content" id="map-content">
+                <!-- Map elements will be added here -->
+            </div>
+        </div>
+        
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <div class="panel-section">
+                <div class="tent-creator">
                     <div class="tent" id="tent"></div>
                     <div class="people-counter">People: <span id="people-count">0</span></div>
                 </div>
                 
-                <div class="stats">
+                <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-value" id="total-people">0</div>
                         <div class="stat-label">Total People</div>
@@ -433,18 +451,17 @@
                         <div class="stat-value" id="buildings">1</div>
                         <div class="stat-label">Buildings</div>
                     </div>
-                </div>
-                
-                <h2 class="panel-title">Resources</h2>
-                <div class="resource-grid" id="resource-grid">
-                    <!-- Resource items will be added here -->
-                </div>
-                
-                <div class="research-panel">
-                    <h2 class="panel-title">Research</h2>
-                    <div class="research-grid" id="research-grid">
-                        <!-- Research items will be added here -->
+                    <div class="stat-item">
+                        <div class="stat-value" id="population">0</div>
+                        <div class="stat-label">Population</div>
                     </div>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <h2 class="panel-title">Research</h2>
+                <div class="research-grid" id="research-grid">
+                    <!-- Research items will be added here -->
                 </div>
             </div>
         </div>
@@ -457,6 +474,7 @@
         const gameState = {
             people: 0,
             totalPeople: 0,
+            population: 0,
             buildings: 1, // Starting with the tent
             resources: {
                 food: 0,
@@ -510,14 +528,15 @@
         const totalPeopleElement = document.getElementById('total-people');
         const activeResearchElement = document.getElementById('active-research');
         const buildingsElement = document.getElementById('buildings');
-        const resourceGridElement = document.getElementById('resource-grid');
+        const populationElement = document.getElementById('population');
+        const topResourcesElement = document.getElementById('top-resources');
         const researchGridElement = document.getElementById('research-grid');
-        const mapContainerElement = document.getElementById('map-container');
+        const mapContentElement = document.getElementById('map-content');
         const notificationElement = document.getElementById('notification');
         
         // Initialize the game
         function initGame() {
-            renderResources();
+            renderTopResources();
             renderResearch();
             renderMap();
             updateStats();
@@ -526,6 +545,7 @@
             tentElement.addEventListener('click', () => {
                 gameState.people++;
                 gameState.totalPeople++;
+                gameState.population++;
                 updateStats();
                 showNotification('+1 Person created!');
                 
@@ -615,12 +635,7 @@
         
         // Render the map
         function renderMap() {
-            mapContainerElement.innerHTML = `
-                <div class="map-overlay">
-                    <div class="map-title">Your Settlement</div>
-                    <div>Expand your civilization by completing research!</div>
-                </div>
-            `;
+            mapContentElement.innerHTML = '';
             
             gameState.mapElements.forEach(element => {
                 const elementDiv = document.createElement('div');
@@ -628,13 +643,13 @@
                 elementDiv.style.left = `${element.x}px`;
                 elementDiv.style.top = `${element.y}px`;
                 elementDiv.style.zIndex = element.type === 'people' ? 2 : 1;
-                mapContainerElement.appendChild(elementDiv);
+                mapContentElement.appendChild(elementDiv);
             });
         }
         
-        // Render resources panel
-        function renderResources() {
-            resourceGridElement.innerHTML = '';
+        // Render top resource bar
+        function renderTopResources() {
+            topResourcesElement.innerHTML = '';
             
             const resources = [
                 { id: 'food', name: 'Food', icon: '🌾' },
@@ -647,10 +662,10 @@
                 const resourceElement = document.createElement('div');
                 resourceElement.className = 'resource-item';
                 resourceElement.innerHTML = `
-                    <div class="resource-name">${resource.icon} ${resource.name}</div>
+                    <div class="resource-icon">${resource.icon}</div>
                     <div class="resource-value">${gameState.resources[resource.id].toFixed(1)}</div>
                 `;
-                resourceGridElement.appendChild(resourceElement);
+                topResourcesElement.appendChild(resourceElement);
             });
         }
         
@@ -675,7 +690,10 @@
                 if (id === 'advancedTools') icon = '⚙️';
                 
                 researchElement.innerHTML = `
-                    <div class="research-title">${icon} ${research.name}</div>
+                    <div class="research-header">
+                        <div class="research-icon">${icon}</div>
+                        <div class="research-title">${research.name}</div>
+                    </div>
                     <div class="research-cost">Cost: ${research.cost} people</div>
                     <div class="research-desc">${research.description}</div>
                     <div class="progress-bar">
@@ -706,7 +724,8 @@
             totalPeopleElement.textContent = gameState.totalPeople;
             activeResearchElement.textContent = gameState.activeResearch.length;
             buildingsElement.textContent = gameState.buildings;
-            renderResources();
+            populationElement.textContent = gameState.population;
+            renderTopResources();
         }
         
         // Show notification
@@ -721,6 +740,20 @@
         
         // Initialize the game when the page loads
         window.addEventListener('load', initGame);
+        
+        // Prevent scrolling and zooming on mobile
+        document.addEventListener('touchmove', function(e) {
+            if (e.scale !== 1) { e.preventDefault(); }
+        }, { passive: false });
+        
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
