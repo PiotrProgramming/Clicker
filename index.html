@@ -17,24 +17,37 @@
             color: #fff;
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
         header {
             text-align: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
+            padding: 15px 0;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
         
         h1 {
-            font-size: 2.8rem;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+            margin-bottom: 8px;
             color: #ffd700;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #90caf9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.5;
         }
         
         .game-container {
@@ -43,13 +56,35 @@
             flex-wrap: wrap;
         }
         
-        .main-panel {
-            flex: 1;
-            min-width: 300px;
+        .map-panel {
+            flex: 2;
+            min-width: 500px;
             background: rgba(0, 0, 0, 0.7);
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .map-container {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(to bottom, #8fbc8f, #556b2f);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .map-element {
+            position: absolute;
+            transition: transform 0.2s, opacity 0.3s;
+        }
+        
+        .map-element:hover {
+            transform: scale(1.1);
+            z-index: 10;
         }
         
         .resources-panel {
@@ -59,6 +94,8 @@
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
         }
         
         .panel-title {
@@ -67,22 +104,27 @@
             text-align: center;
             color: #4fc3f7;
             text-shadow: 0 0 5px rgba(79, 195, 247, 0.5);
+            padding-bottom: 10px;
+            border-bottom: 2px solid #37474f;
         }
         
         .tent-container {
             text-align: center;
             margin: 20px 0;
-            position: relative;
+            padding: 15px;
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 12px;
         }
         
         .tent {
-            width: 200px;
-            height: 200px;
+            width: 180px;
+            height: 180px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="20,80 50,20 80,80" fill="%238B4513"/><rect x="30" y="80" width="40" height="10" fill="%235D4037"/></svg>') no-repeat center;
             background-size: contain;
             cursor: pointer;
             transition: transform 0.1s;
             margin: 0 auto;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
         }
         
         .tent:active {
@@ -91,18 +133,21 @@
         
         .people-counter {
             margin-top: 15px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             background: rgba(0, 0, 0, 0.5);
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
             display: inline-block;
+            font-weight: bold;
+            color: #ffd700;
         }
         
         .resource-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 15px;
+            flex-grow: 1;
         }
         
         .resource-item {
@@ -122,21 +167,26 @@
             font-weight: bold;
             margin-bottom: 5px;
             color: #4fc3f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .resource-value {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: bold;
             color: #ffd700;
         }
         
         .research-panel {
-            margin-top: 30px;
+            margin-top: 25px;
+            flex-shrink: 0;
         }
         
         .research-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
@@ -149,40 +199,47 @@
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            border: 1px solid #37474f;
         }
         
-        .research-item:hover {
+        .research-item:hover:not(.locked) {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             background: rgba(50, 50, 80, 0.9);
+            border-color: #4fc3f7;
         }
         
         .research-item.locked {
             opacity: 0.6;
             cursor: not-allowed;
+            filter: grayscale(0.7);
         }
         
-        .research-item.locked:hover {
-            transform: none;
-            box-shadow: none;
-            background: rgba(40, 40, 60, 0.8);
+        .research-item.completed {
+            background: rgba(30, 60, 30, 0.8);
+            border-color: #4caf50;
         }
         
         .research-title {
             font-weight: bold;
             margin-bottom: 8px;
             color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .research-cost {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #ff9800;
+            margin-bottom: 5px;
         }
         
         .research-desc {
             font-size: 0.85rem;
             margin-top: 8px;
             color: #90a4ae;
+            line-height: 1.4;
         }
         
         .progress-bar {
@@ -204,14 +261,16 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             color: #4caf50;
-            padding: 12px 20px;
+            padding: 14px 22px;
             border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
             transform: translateX(200%);
-            transition: transform 0.3s;
-            z-index: 100;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            font-weight: bold;
+            border-left: 4px solid #4caf50;
         }
         
         .notification.show {
@@ -225,10 +284,13 @@
             padding: 15px;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .stat-item {
             text-align: center;
+            min-width: 100px;
         }
         
         .stat-value {
@@ -242,13 +304,93 @@
             color: #90a4ae;
         }
         
-        @media (max-width: 768px) {
+        .map-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #e0f7fa;
+            z-index: 5;
+        }
+        
+        .map-title {
+            font-weight: bold;
+            color: #4fc3f7;
+            margin-bottom: 5px;
+        }
+        
+        /* Map element styles */
+        .map-tent {
+            width: 80px;
+            height: 80px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="20,80 50,20 80,80" fill="%238B4513"/><rect x="30" y="80" width="40" height="10" fill="%235D4037"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        
+        .map-people {
+            width: 30px;
+            height: 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="40" r="15" fill="%23FFD700"/><rect x="35" y="55" width="30" height="30" fill="%23FFD700" rx="5"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        
+        .map-farm {
+            width: 60px;
+            height: 60px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="20" y="40" width="60" height="40" fill="%238BC34A" rx="5"/><rect x="30" y="30" width="40" height="10" fill="%234CAF50"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        
+        .map-wood {
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="40" y="20" width="20" height="60" fill="%23795548" rx="3"/><circle cx="50" cy="50" r="15" fill="%235D4037"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        
+        .map-stone {
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="30" y="30" width="40" height="40" fill="%239E9E9E" rx="8"/><circle cx="50" cy="50" r="10" fill="%23757575"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        
+        .map-mine {
+            width: 70px;
+            height: 70px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="25" y="30" width="50" height="50" fill="%23607D8B" rx="5"/><rect x="35" y="20" width="30" height="10" fill="%23455A64"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        
+        @media (max-width: 900px) {
             .game-container {
                 flex-direction: column;
             }
             
+            .map-container {
+                height: 400px;
+            }
+            
             .resource-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .map-container {
+                height: 300px;
+            }
+            
+            .tent {
+                width: 140px;
+                height: 140px;
+            }
+            
+            h1 {
+                font-size: 2rem;
             }
         }
     </style>
@@ -257,12 +399,22 @@
     <div class="container">
         <header>
             <h1>Primitive City Builder</h1>
-            <p>Click the tent to create people. Assign them to research to unlock new resources!</p>
+            <p class="subtitle">Click the tent to create people. Assign them to research to unlock new buildings and resources on your map!</p>
         </header>
         
         <div class="game-container">
-            <div class="main-panel">
-                <h2 class="panel-title">Your Settlement</h2>
+            <div class="map-panel">
+                <h2 class="panel-title">Settlement Map</h2>
+                <div class="map-container" id="map-container">
+                    <div class="map-overlay">
+                        <div class="map-title">Your Settlement</div>
+                        <div>Expand your civilization by completing research!</div>
+                    </div>
+                    <!-- Map elements will be added here dynamically -->
+                </div>
+            </div>
+            
+            <div class="resources-panel">
                 <div class="tent-container">
                     <div class="tent" id="tent"></div>
                     <div class="people-counter">People: <span id="people-count">0</span></div>
@@ -277,6 +429,15 @@
                         <div class="stat-value" id="active-research">0</div>
                         <div class="stat-label">Active Research</div>
                     </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="buildings">1</div>
+                        <div class="stat-label">Buildings</div>
+                    </div>
+                </div>
+                
+                <h2 class="panel-title">Resources</h2>
+                <div class="resource-grid" id="resource-grid">
+                    <!-- Resource items will be added here -->
                 </div>
                 
                 <div class="research-panel">
@@ -284,13 +445,6 @@
                     <div class="research-grid" id="research-grid">
                         <!-- Research items will be added here -->
                     </div>
-                </div>
-            </div>
-            
-            <div class="resources-panel">
-                <h2 class="panel-title">Resources</h2>
-                <div class="resource-grid" id="resource-grid">
-                    <!-- Resource items will be added here -->
                 </div>
             </div>
         </div>
@@ -303,6 +457,7 @@
         const gameState = {
             people: 0,
             totalPeople: 0,
+            buildings: 1, // Starting with the tent
             resources: {
                 food: 0,
                 wood: 0,
@@ -315,31 +470,38 @@
                     cost: 5, 
                     progress: 0, 
                     completed: false,
-                    description: "Create simple stone tools to gather resources more efficiently"
+                    description: "Create simple stone tools to gather wood and stone",
+                    unlocks: ['wood', 'stone']
                 },
                 agriculture: { 
                     name: "Agriculture", 
                     cost: 10, 
                     progress: 0, 
                     completed: false,
-                    description: "Develop farming techniques to produce food"
+                    description: "Develop farming techniques to produce food",
+                    unlocks: ['farm']
                 },
                 mining: { 
                     name: "Mining", 
                     cost: 15, 
                     progress: 0, 
                     completed: false,
-                    description: "Extract minerals from the earth"
+                    description: "Extract valuable minerals from the earth",
+                    unlocks: ['mine']
                 },
                 advancedTools: { 
                     name: "Advanced Tools", 
                     cost: 25, 
                     progress: 0, 
                     completed: false,
-                    description: "Craft better tools for faster resource gathering"
+                    description: "Craft better tools for faster resource gathering",
+                    unlocks: []
                 }
             },
-            activeResearch: []
+            activeResearch: [],
+            mapElements: [
+                { type: 'tent', x: 400, y: 250, id: 'main-tent' }
+            ]
         };
         
         // DOM Elements
@@ -347,14 +509,17 @@
         const peopleCountElement = document.getElementById('people-count');
         const totalPeopleElement = document.getElementById('total-people');
         const activeResearchElement = document.getElementById('active-research');
+        const buildingsElement = document.getElementById('buildings');
         const resourceGridElement = document.getElementById('resource-grid');
         const researchGridElement = document.getElementById('research-grid');
+        const mapContainerElement = document.getElementById('map-container');
         const notificationElement = document.getElementById('notification');
         
         // Initialize the game
         function initGame() {
             renderResources();
             renderResearch();
+            renderMap();
             updateStats();
             
             // Tent click handler
@@ -363,6 +528,12 @@
                 gameState.totalPeople++;
                 updateStats();
                 showNotification('+1 Person created!');
+                
+                // Add a person to the map
+                addMapElement('people', 
+                    350 + Math.random() * 100, 
+                    200 + Math.random() * 100
+                );
             });
             
             // Game loop
@@ -384,7 +555,30 @@
                     research.completed = true;
                     gameState.activeResearch.splice(i, 1);
                     showNotification(`${research.name} completed!`);
+                    
+                    // Add new buildings to the map
+                    if (research.unlocks.includes('farm')) {
+                        addMapElement('farm', 200, 300);
+                        gameState.buildings++;
+                    }
+                    if (research.unlocks.includes('mine')) {
+                        addMapElement('mine', 600, 350);
+                        gameState.buildings++;
+                    }
+                    if (research.unlocks.includes('wood')) {
+                        addMapElement('wood', 150, 150);
+                        addMapElement('wood', 700, 100);
+                        gameState.buildings += 2;
+                    }
+                    if (research.unlocks.includes('stone')) {
+                        addMapElement('stone', 100, 400);
+                        addMapElement('stone', 750, 450);
+                        gameState.buildings += 2;
+                    }
+                    
                     renderResearch();
+                    renderMap();
+                    updateStats();
                 }
             }
             
@@ -410,6 +604,32 @@
             }
             
             updateStats();
+        }
+        
+        // Add a new element to the map
+        function addMapElement(type, x, y) {
+            const id = `${type}-${Date.now()}`;
+            gameState.mapElements.push({ type, x, y, id });
+            renderMap();
+        }
+        
+        // Render the map
+        function renderMap() {
+            mapContainerElement.innerHTML = `
+                <div class="map-overlay">
+                    <div class="map-title">Your Settlement</div>
+                    <div>Expand your civilization by completing research!</div>
+                </div>
+            `;
+            
+            gameState.mapElements.forEach(element => {
+                const elementDiv = document.createElement('div');
+                elementDiv.className = `map-element map-${element.type}`;
+                elementDiv.style.left = `${element.x}px`;
+                elementDiv.style.top = `${element.y}px`;
+                elementDiv.style.zIndex = element.type === 'people' ? 2 : 1;
+                mapContainerElement.appendChild(elementDiv);
+            });
         }
         
         // Render resources panel
@@ -440,13 +660,22 @@
             
             Object.entries(gameState.research).forEach(([id, research]) => {
                 const researchElement = document.createElement('div');
-                researchElement.className = `research-item ${research.completed ? 'completed' : ''} ${gameState.people < research.cost && !research.completed ? 'locked' : ''}`;
+                const isCompleted = research.completed;
+                const isLocked = !isCompleted && gameState.people < research.cost;
+                researchElement.className = `research-item ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
                 
                 // Calculate progress percentage
-                const progressPercent = research.completed ? 100 : (research.progress / research.cost) * 100;
+                const progressPercent = isCompleted ? 100 : (research.progress / research.cost) * 100;
+                
+                // Get icon based on research
+                let icon = '🔬';
+                if (id === 'basicTools') icon = '🪨';
+                if (id === 'agriculture') icon = '🌱';
+                if (id === 'mining') icon = '⛏️';
+                if (id === 'advancedTools') icon = '⚙️';
                 
                 researchElement.innerHTML = `
-                    <div class="research-title">${research.name}</div>
+                    <div class="research-title">${icon} ${research.name}</div>
                     <div class="research-cost">Cost: ${research.cost} people</div>
                     <div class="research-desc">${research.description}</div>
                     <div class="progress-bar">
@@ -455,7 +684,7 @@
                 `;
                 
                 // Add click handler if not completed and not locked
-                if (!research.completed && gameState.people >= research.cost) {
+                if (!isCompleted && !isLocked) {
                     researchElement.addEventListener('click', () => {
                         if (!gameState.activeResearch.includes(id)) {
                             gameState.activeResearch.push(id);
@@ -476,6 +705,7 @@
             peopleCountElement.textContent = Math.floor(gameState.people);
             totalPeopleElement.textContent = gameState.totalPeople;
             activeResearchElement.textContent = gameState.activeResearch.length;
+            buildingsElement.textContent = gameState.buildings;
             renderResources();
         }
         
